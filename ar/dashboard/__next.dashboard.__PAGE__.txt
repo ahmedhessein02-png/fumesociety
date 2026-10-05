@@ -1,0 +1,21 @@
+1:"$Sreact.fragment"
+2:I[22016,["/ar/_next/static/chunks/1fz8brbop98ag.js","/ar/_next/static/chunks/32ijcdj-6dyes.js"],""]
+3:I[25725,["/ar/_next/static/chunks/1fz8brbop98ag.js","/ar/_next/static/chunks/32ijcdj-6dyes.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+8:I[25725,["/ar/_next/static/chunks/1fz8brbop98ag.js","/ar/_next/static/chunks/32ijcdj-6dyes.js"],"ViewportBoundary"]
+9:I[25725,["/ar/_next/static/chunks/1fz8brbop98ag.js","/ar/_next/static/chunks/32ijcdj-6dyes.js"],"MetadataBoundary"]
+a:I[27201,["/ar/_next/static/chunks/1fz8brbop98ag.js","/ar/_next/static/chunks/32ijcdj-6dyes.js"],"IconMark"]
+c:I[39756,["/ar/_next/static/chunks/1fz8brbop98ag.js","/ar/_next/static/chunks/32ijcdj-6dyes.js"],"default"]
+d:I[37457,["/ar/_next/static/chunks/1fz8brbop98ag.js","/ar/_next/static/chunks/32ijcdj-6dyes.js"],"default"]
+7:X
+f:X
+f:C
+0:{"buildId":"oHdClpZVW3VO4FkVvi1tV","data":[{"rsc":["$","$1","c",{"children":[["$","section",null,{"className":"mx-auto flex min-h-svh max-w-xl flex-col justify-center gap-6 px-5 py-20","children":[["$","p",null,{"className":"text-xs uppercase tracking-[0.16em] text-gold-deep","children":"FumeSociety"}],["$","h1",null,{"className":"font-display text-5xl","children":"الطلبات"}],["$","p",null,{"className":"text-lg leading-relaxed text-muted","children":"هذا الموقع العام يرسل الطلب عبر واتساب. قائمة الطلبات المحفوظة تعمل على استضافة Node.js، وليست على GitHub Pages."}],["$","$L2",null,{"href":"/","className":"inline-flex min-h-11 w-fit items-center rounded-full bg-ink px-6 text-sm text-paper","children":"المتجر"}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":"$@6","staleTime":"$7","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$L8",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#141414"}]]}],["$","div",null,{"hidden":true,"children":["$","$L9",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"FumeSociety — عطرك. مجتمعك."}],["$","meta","1",{"name":"description","content":"عطور أصلية في دهوك، مع أحجام وأسعار واضحة. اطلب عبر الموقع وادفع عند الاستلام أو عبر FIB."}],["$","link","2",{"rel":"icon","href":"/ar/icon.png?icon.0zcx-8dxxycmz.png","sizes":"512x512","type":"image/png"}],["$","link","3",{"rel":"apple-touch-icon","href":"/ar/apple-icon.png?apple-icon.0l36-80xy1cw1.png","sizes":"180x180","type":"image/png"}],["$","$La","4",{}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isPartial":"$@b","staleTime":"$7","varyParams":null},{"rsc":["$","$1","c",{"children":[null,["$","$Lc",null,{"parallelRouterKey":"children","template":["$","$Ld",null,{}]}]]}],"isPartial":"$@e","staleTime":"$7","varyParams":"$f"}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
+5:null
+11:true
+7:300
+7:C
+10:0
+b:"$undefined"
+e:"$undefined"
+6:"$undefined"
