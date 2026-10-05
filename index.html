@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FumeSociety</title>
+    <meta name="description" content="FumeSociety curates original perfumes. Scent, redefined." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&family=Marcellus&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#app">Skip to content</a>
+    <header id="header" class="header">
+      <a class="wordmark" href="#/">FumeSociety</a>
+      <nav id="nav" class="nav" aria-label="Primary">
+        <a href="#/" data-nav="home">Home</a>
+        <a href="#/collection" data-nav="collection">Collection</a>
+        <a href="#/about" data-nav="about">About</a>
+        <a href="#/contact" data-nav="contact">Contact</a>
+      </nav>
+      <div class="tools">
+        <button class="icon-btn menu-btn" type="button" data-act="menu" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <button class="icon-btn" type="button" data-act="search" aria-label="Search" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="M16 16 L21 21"></path></svg>
+        </button>
+        <button class="icon-btn bag-btn" type="button" data-act="bag" aria-label="Bag" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8 h12 l-1 12 H7 Z"></path><path d="M9 8 V7 a3 3 0 0 1 6 0 V8"></path></svg>
+          <span class="count" id="bag-count" hidden>0</span>
+        </button>
+      </div>
+    </header>
+
+    <section id="search" class="search" hidden>
+      <label class="lbl" for="search-input">Search</label>
+      <input id="search-input" type="search" placeholder="A house, a name, a note" autocomplete="off" />
+      <div id="hits"></div>
+    </section>
+
+    <main id="app" tabindex="-1"></main>
+
+    <footer class="foot veil" aria-label="House promises">
+      <div><span class="rn" aria-hidden="true">I</span><strong>Original</strong><span>Perfume only</span></div>
+      <div><span class="rn" aria-hidden="true">II</span><strong>4-5 days</strong><span>Delivery time</span></div>
+      <div><span class="rn" aria-hidden="true">III</span><strong>COD or FIB</strong><span>Payment options</span></div>
+      <div><span class="rn" aria-hidden="true">IV</span><strong>Curated</strong><span>Luxury scents</span></div>
+    </footer>
+
+    <div id="scrim" class="scrim" hidden data-act="close"></div>
+    <aside id="bag" class="bag" aria-hidden="true" aria-label="Bag">
+      <div class="bag-head">
+        <h2>Your bag</h2>
+        <button class="text-btn" type="button" data-act="close">Close</button>
+      </div>
+      <div id="bag-body" class="bag-body"></div>
+    </aside>
+    <script src="app.js"></script>
+  </body>
+</html>
