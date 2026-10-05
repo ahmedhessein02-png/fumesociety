@@ -581,3 +581,35 @@ textarea.field { min-height: 120px; resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; }
 }
+
+.lang {
+  border: 0;
+  background: transparent;
+  color: var(--champagne);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0 8px;
+}
+.slides { position: relative; height: 72vh; min-height: 420px; overflow: hidden; background: #111; }
+.slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease; }
+.slides img.on { opacity: 1; }
+.marquee { overflow: hidden; border-top: 1px solid rgba(212, 175, 55, 0.35); border-bottom: 1px solid rgba(212, 175, 55, 0.35); background: #14120e; }
+.marquee-track { display: flex; gap: 36px; width: max-content; animation: ticker 90s linear infinite; padding: 16px 0; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee-track a { display: inline-flex; align-items: center; gap: 12px; color: var(--ivory); text-decoration: none; white-space: nowrap; letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.75rem; }
+.marquee-track img { height: 42px; width: auto; max-width: 120px; object-fit: contain; filter: grayscale(1) contrast(1.2); }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.hcard .mark { display: block; height: 72px; width: auto; max-width: 78%; margin: 8px auto 14px; object-fit: contain; filter: grayscale(1) contrast(1.15); }
+.phone-row { display: flex; justify-content: center; padding: 8px 16px 28px; }
+.phone-row a { color: var(--gold); letter-spacing: 0.12em; text-decoration: none; }
+html[dir="rtl"] body { font-family: "IBM Plex Sans Arabic", "Josefin Sans", sans-serif; }
+html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] .wordmark { font-family: Amiri, Marcellus, serif; }
+.pager { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 28px; }
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; flex-wrap: wrap; width: auto; }
+  .slides img { transition: none; }
+}

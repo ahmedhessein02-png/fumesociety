@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FumeSociety</title>
-    <meta name="description" content="FumeSociety curates original perfumes. Scent, redefined." />
+    <meta name="description" content="FumeSociety curates original perfumes in Duhok. Scent, redefined." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&family=Marcellus&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500&family=Josefin+Sans:wght@300;400;500;600&family=Marcellus&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -15,12 +15,17 @@
     <header id="header" class="header">
       <a class="wordmark" href="#/">FumeSociety</a>
       <nav id="nav" class="nav" aria-label="Primary">
-        <a href="#/" data-nav="home">Home</a>
-        <a href="#/collection" data-nav="collection">Collection</a>
-        <a href="#/about" data-nav="about">About</a>
-        <a href="#/contact" data-nav="contact">Contact</a>
+        <a href="#/" data-nav="home" data-i18n="home">Home</a>
+        <a href="#/collection" data-nav="collection" data-i18n="collection">Collection</a>
+        <a href="#/perfumes" data-nav="perfumes" data-i18n="perfumes">Perfumes</a>
+        <a href="#/men" data-nav="men" data-i18n="men">Men</a>
+        <a href="#/women" data-nav="women" data-i18n="women">Women</a>
+        <a href="#/unisex" data-nav="unisex" data-i18n="unisex">Unisex</a>
+        <a href="#/about" data-nav="about" data-i18n="about">About</a>
+        <a href="#/contact" data-nav="contact" data-i18n="contact">Contact</a>
       </nav>
       <div class="tools">
+        <button class="lang" type="button" data-act="lang">العربية</button>
         <button class="icon-btn menu-btn" type="button" data-act="menu" aria-label="Menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
@@ -35,25 +40,26 @@
     </header>
 
     <section id="search" class="search" hidden>
-      <label class="lbl" for="search-input">Search</label>
-      <input id="search-input" type="search" placeholder="A house, a name, a note" autocomplete="off" />
+      <label class="lbl" for="search-input" data-i18n="search">Search</label>
+      <input id="search-input" type="search" autocomplete="off" />
       <div id="hits"></div>
     </section>
 
     <main id="app" tabindex="-1"></main>
 
     <footer class="foot veil" aria-label="House promises">
-      <div><span class="rn" aria-hidden="true">I</span><strong>Original</strong><span>Perfume only</span></div>
-      <div><span class="rn" aria-hidden="true">II</span><strong>4-5 days</strong><span>Delivery time</span></div>
-      <div><span class="rn" aria-hidden="true">III</span><strong>COD or FIB</strong><span>Payment options</span></div>
-      <div><span class="rn" aria-hidden="true">IV</span><strong>Curated</strong><span>Luxury scents</span></div>
+      <div><span class="rn" aria-hidden="true">I</span><strong data-i18n="p1">Original</strong><span data-i18n="p1s">Perfume only</span></div>
+      <div><span class="rn" aria-hidden="true">II</span><strong data-i18n="p2">4-5 days</strong><span data-i18n="p2s">Delivery time</span></div>
+      <div><span class="rn" aria-hidden="true">III</span><strong data-i18n="p3">COD or FIB</strong><span data-i18n="p3s">Payment options</span></div>
+      <div><span class="rn" aria-hidden="true">IV</span><strong data-i18n="p4">Curated</strong><span data-i18n="p4s">Luxury scents</span></div>
     </footer>
+    <p class="phone-row"><a href="https://wa.me/9647508937745" data-i18n="phone">WhatsApp +964 750 893 7745</a></p>
 
     <div id="scrim" class="scrim" hidden data-act="close"></div>
     <aside id="bag" class="bag" aria-hidden="true" aria-label="Bag">
       <div class="bag-head">
-        <h2>Your bag</h2>
-        <button class="text-btn" type="button" data-act="close">Close</button>
+        <h2 data-i18n="bag">Your bag</h2>
+        <button class="text-btn" type="button" data-act="close" data-i18n="close">Close</button>
       </div>
       <div id="bag-body" class="bag-body"></div>
     </aside>
