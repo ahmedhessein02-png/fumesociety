@@ -1,0 +1,8 @@
+{
+  "name": "fumesociety-admin",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "routes": [{"pattern": "fumesociety.com/api/*", "zone_name": "fumesociety.com"}],
+  "d1_databases": [{"binding": "DB", "database_name": "fumesociety-orders", "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"}]
+}

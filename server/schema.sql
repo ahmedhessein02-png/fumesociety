@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS admin_sessions (token_hash TEXT PRIMARY KEY, revision TEXT NOT NULL, expires_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS request_limits (id TEXT PRIMARY KEY, attempts INTEGER NOT NULL, expires_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS orders (ref TEXT PRIMARY KEY, created_at INTEGER NOT NULL, payload TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS orders_created ON orders(created_at DESC);

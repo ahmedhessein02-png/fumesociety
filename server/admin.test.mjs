@@ -1,0 +1,30 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import {onRequest} from '../functions/api/[[path]].js';
+import {passwordHash,token} from './crypto.mjs';
+const sql=new DatabaseSync(':memory:');sql.exec(readFileSync(new URL('./schema.sql',import.meta.url),'utf8'));
+const DB={prepare(query){return {bind(...args){return {async run(){return sql.prepare(query).run(...args)},async first(){return sql.prepare(query).get(...args)},async all(){return {results:sql.prepare(query).all(...args)}}}}}}};
+const salt=token(),password='test-only-long-password';const env={DB,FUME_ADMIN:JSON.stringify({username:'owner',salt,password_hash:await passwordHash(password,salt),revision:token()})};
+let cookie='';
+const request=(path,method='GET',data=null,auth=false,origin='https://shop.test')=>onRequest({env,request:new Request('https://shop.test/api/'+path,{method,headers:{origin,'content-type':'application/json','cf-connecting-ip':'127.0.0.1',...(auth?{cookie}: {})},...(data?{body:JSON.stringify(data)}:{})})});
+test('authentication, private orders and invalidation',async()=>{
+ assert.equal((await request('admin/orders')).status,401);
+ assert.equal((await request('admin/login','POST',{username:'owner',password:'wrong'})).status,401);
+ assert.equal((await request('admin/login','POST',{username:'owner',password},false,'https://evil.test')).status,403);
+ const login=await request('admin/login','POST',{username:'owner',password});assert.equal(login.status,200);const raw=login.headers.get('set-cookie');for(const flag of ['HttpOnly','Secure','SameSite=Strict'])assert.ok(raw.includes(flag));cookie=raw.split(';')[0];
+ assert.equal((await request('admin/session','GET',null,true)).status,200);
+ const order={ref:'FS-TEST-123',name:'Test customer',phone:'000000000',city:'Test city',address:'Test address',payment:'cod',lines:[{id:'test-product',size:'100 ml',qty:1}]};
+ assert.equal((await request('orders','POST',order)).status,201);assert.equal((await request('orders','POST',order)).status,201);
+ let response=await request('admin/orders','GET',null,true);assert.equal(response.status,200);let data=await response.json();assert.equal(data.orders.length,1);assert.equal(data.orders[0].name,'Test customer');
+ assert.equal((await request('admin/orders')).status,401);
+ assert.equal((await request('orders','POST',{...order,lines:[{id:'x',size:'1',qty:-1}]})).status,400);
+ assert.equal((await request('admin/logout','POST',{},true)).status,200);assert.equal((await request('admin/orders','GET',null,true)).status,401);
+ const again=await request('admin/login','POST',{username:'owner',password});cookie=again.headers.get('set-cookie').split(';')[0];sql.exec('UPDATE admin_sessions SET expires_at=0');assert.equal((await request('admin/orders','GET',null,true)).status,401);
+ const third=await request('admin/login','POST',{username:'owner',password});cookie=third.headers.get('set-cookie').split(';')[0];env.FUME_ADMIN=JSON.stringify({...JSON.parse(env.FUME_ADMIN),revision:token()});assert.equal((await request('admin/session','GET',null,true)).status,401);
+});
+test('login throttling and unconfigured backend',async()=>{
+ let r;for(let i=0;i<12;i++)r=await request('admin/login','POST',{username:'owner',password:'wrong'});assert.equal(r.status,429);
+ assert.equal((await onRequest({env:{},request:new Request('https://shop.test/api/admin/session')})).status,503);
+});
