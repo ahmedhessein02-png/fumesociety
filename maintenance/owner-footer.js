@@ -18,6 +18,10 @@
       footer.append(row);
     });
   }
-  new MutationObserver(addOwnerLink).observe(document.documentElement, {childList:true, subtree:true});
-  addOwnerLink();
+  function ready() {
+    new MutationObserver(addOwnerLink).observe(document.documentElement, {childList:true, subtree:true});
+    addOwnerLink();
+  }
+  if (window.fumeStoreReady) ready();
+  else window.addEventListener('fume-store-ready', ready, {once:true});
 })();
