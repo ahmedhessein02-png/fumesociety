@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import {onRequest} from '../functions/api/[[path]].js';
+import base from './catalog-base.mjs';
 import {passwordHash,token} from './crypto.mjs';
 const sql=new DatabaseSync(':memory:');sql.exec(readFileSync(new URL('./schema.sql',import.meta.url),'utf8'));
-const DB={prepare(query){return {bind(...args){return {async run(){return sql.prepare(query).run(...args)},async first(){return sql.prepare(query).get(...args)},async all(){return {results:sql.prepare(query).all(...args)}}}}}}};
+const DB={prepare(query){return {bind(...args){args=args.map(x=>x instanceof ArrayBuffer?new Uint8Array(x):x);return {async run(){return sql.prepare(query).run(...args)},async first(){return sql.prepare(query).get(...args)},async all(){return {results:sql.prepare(query).all(...args)}}}}}}};
 const salt=token(),password='test-only-long-password';const env={DB,FUME_ADMIN:JSON.stringify({username:'owner',salt,password_hash:await passwordHash(password,salt),revision:token()})};
 let cookie='';
 const request=(path,method='GET',data=null,auth=false,origin='https://shop.test')=>onRequest({env,request:new Request('https://shop.test/api/'+path,{method,headers:{origin,'content-type':'application/json','cf-connecting-ip':'127.0.0.1',...(auth?{cookie}: {})},...(data?{body:JSON.stringify(data)}:{})})});
@@ -15,7 +16,7 @@ test('authentication, private orders and invalidation',async()=>{
  assert.equal((await request('admin/login','POST',{username:'owner',password},false,'https://evil.test')).status,403);
  const login=await request('admin/login','POST',{username:'owner',password});assert.equal(login.status,200);const raw=login.headers.get('set-cookie');for(const flag of ['HttpOnly','Secure','SameSite=Strict'])assert.ok(raw.includes(flag));cookie=raw.split(';')[0];
  assert.equal((await request('admin/session','GET',null,true)).status,200);
- const order={ref:'FS-TEST-123',name:'Test customer',phone:'000000000',city:'Test city',address:'Test address',payment:'cod',lines:[{id:'test-product',size:'100 ml',qty:1}]};
+ const order={ref:'FS-TEST-123',name:'Test customer',phone:'000000000',city:'Test city',address:'Test address',payment:'cod',lines:[{id:base[0].id,size:base[0].variants[0].size,qty:1}]};
  assert.equal((await request('orders','POST',order)).status,201);assert.equal((await request('orders','POST',order)).status,201);
  let response=await request('admin/orders','GET',null,true);assert.equal(response.status,200);let data=await response.json();assert.equal(data.orders.length,1);assert.equal(data.orders[0].name,'Test customer');
  assert.equal((await request('admin/orders')).status,401);
@@ -27,4 +28,35 @@ test('authentication, private orders and invalidation',async()=>{
 test('login throttling and unconfigured backend',async()=>{
  let r;for(let i=0;i<12;i++)r=await request('admin/login','POST',{username:'owner',password:'wrong'});assert.equal(r.status,429);
  assert.equal((await onRequest({env:{},request:new Request('https://shop.test/api/admin/session')})).status,503);
+});
+test('catalog edits, authoritative discounts, orders, status and image protection',async()=>{
+ sql.exec('DELETE FROM request_limits');
+ const login=await request('admin/login','POST',{username:'owner',password});cookie=login.headers.get('set-cookie').split(';')[0];
+ const product={...base[0],id:'fume-integration-test',label:'Test fragrance',variants:[{size:'50ml',price:100},{size:'100ml',price:150}],discountType:'percentage',discountValue:20,published:true};
+ assert.equal((await request('admin/products','POST',product)).status,401);
+ assert.equal((await request('admin/products','POST',product,true,'https://evil.test')).status,403);
+ assert.equal((await request('admin/products','POST',{...product,discountValue:101},true)).status,400);
+ assert.equal((await request('admin/products','POST',product,true)).status,200);
+ const shop=await (await request('shop')).json();let p=shop.products.find(x=>x.id===product.id);assert.equal(p.variants[0].price,80);assert.equal(p.variants[1].price,120);assert.equal(p.variants[0].regularPrice,100);
+ const order={ref:'FS-INTEGRATION-123',name:'Customer',phone:'00000000',city:'Duhok',address:'Test',payment:'cod',lines:[{id:product.id,size:'50ml',qty:2,price:1}]};
+ assert.equal((await request('orders','POST',order)).status,409);
+ order.lines[0].price=80;let saved=await (await request('orders','POST',order)).json();assert.equal(saved.saved,true);assert.equal(saved.order.subtotal,160);
+ product.discountType='fixed';product.discountValue=30;
+ assert.equal((await request('admin/products','PATCH',product,true)).status,200);
+ // Retrying an acknowledged order keeps its original discount and creates no duplicate.
+ saved=await (await request('orders','POST',order)).json();assert.equal(saved.order.subtotal,160);
+ assert.equal((await request('admin/orders','PATCH',{ref:order.ref,status:'completed'},true)).status,200);
+ const inbox=await (await request('admin/orders','GET',null,true)).json();assert.equal(inbox.orders.find(o=>o.ref===order.ref).status,'completed');
+ assert.equal(inbox.orders.filter(o=>o.ref===order.ref).length,1);
+ assert.equal((await request('admin/orders','PATCH',{ref:order.ref,status:'invalid'},true)).status,400);
+ product.published=false;await request('admin/products','PATCH',product,true);
+ assert.equal((await (await request('shop')).json()).products.some(x=>x.id===product.id),false);
+ assert.equal((await request('orders','POST',{...order,ref:'FS-HIDDEN-123'})).status,400);
+ assert.equal((await request('orders','POST',{...order,ref:'FS-UNKNOWN-123',lines:[{id:'missing',size:'100ml',qty:1}]})).status,400);
+ const upload=async(mime,bytes,auth=true)=>onRequest({env,request:new Request('https://shop.test/api/admin/images',{method:'POST',headers:{origin:'https://shop.test','content-type':mime,...(auth?{cookie}:{})},body:new Uint8Array(bytes)})});
+ assert.equal((await upload('image/svg+xml',[1,2,3])).status,400);
+ assert.equal((await upload('image/jpeg',[1,2,3])).status,400);
+ assert.equal((await upload('image/jpeg',[255,216,255],false)).status,401);
+ const uploaded=await upload('image/jpeg',[255,216,255]);assert.equal(uploaded.status,201);const {image}=await uploaded.json();const photo=await onRequest({env,request:new Request('https://shop.test'+image)});assert.equal(photo.headers.get('content-type'),'image/jpeg');assert.deepEqual([...new Uint8Array(await photo.arrayBuffer())],[255,216,255]);
+ const stats=await (await request('admin/stats','GET',null,true)).json();assert.equal(stats.total,2);assert.ok(stats.value>=160);
 });

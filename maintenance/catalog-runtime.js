@@ -1,0 +1,11 @@
+/* Live catalogue overrides for the exported storefront. Registered before hydration. */
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"===typeof document?document.currentScript:void 0,990001,e=>{
+'use strict';const React=e.i(71645),empty={},listeners=new Set;let snapshot=empty,started=false;
+function start(){if(started)return;started=true;fetch('/api/catalog',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>{snapshot=Object.fromEntries(d.products.map(p=>[p.id,p]));listeners.forEach(f=>f());const match=location.pathname.match(/\/product\/([^/]+)/);if(match&&snapshot[match[1]])location.replace((location.pathname.startsWith('/ar/')?'/ar':'')+'/shop/?product='+encodeURIComponent(match[1]));}).catch(()=>{started=false})}
+function useCatalog(){React.useEffect(start,[]);return React.useSyncExternalStore(f=>{listeners.add(f);return()=>listeners.delete(f)},()=>snapshot,()=>empty)}
+function useProduct(product){const overrides=useCatalog();return overrides[product.id]||product}
+function useListing(products,category){const overrides=useCatalog();return React.useMemo(()=>{const ids=new Set(products.map(p=>p.id));return [...products.filter(p=>!overrides[p.id]||category==='all'||overrides[p.id].category===category).map(p=>overrides[p.id]||p).filter(p=>p.published!==false),...Object.values(overrides).filter(p=>p.published&&!ids.has(p.id)&&(category==='all'||p.category===category))]},[products,category,overrides])}
+document.addEventListener('click',event=>{const a=event.target.closest?.('a[href]');if(!a||event.defaultPrevented||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;const url=new URL(a.href,location.href),m=url.pathname.match(/\/product\/([^/]+)/);if(url.origin===location.origin&&/\/shop\/?$/.test(url.pathname)){event.preventDefault();event.stopImmediatePropagation();location.assign(url.href);return}if(url.origin===location.origin&&m&&snapshot[m[1]]){event.preventDefault();event.stopImmediatePropagation();location.assign((url.pathname.startsWith('/ar/')?'/ar':'')+'/shop/?product='+encodeURIComponent(m[1]))}},true);
+function href(id){return snapshot[id]?'/shop/?product='+encodeURIComponent(id):'/product/'+id}
+e.s(['href',0,href,'useProduct',0,useProduct,'useListing',0,useListing]);
+}]);
