@@ -29,3 +29,26 @@
 }
 body { margin: 0; color: var(--next-error-text); background: var(--next-error-bg); }
 `.replace(/\n\s*/g,"");function d(){return(0,i.jsx)("svg",{width:"32",height:"32",viewBox:"-0.2 -1.5 32 32",fill:"none",style:l.icon,children:(0,i.jsx)("path",{d:"M16.9328 0C18.0839 0.000116771 19.1334 0.658832 19.634 1.69531L31.4299 26.1309C32.0708 27.4588 31.1036 28.9999 29.6291 29H2.00215C0.527541 29 -0.439628 27.4588 0.201371 26.1309L11.9973 1.69531C12.4979 0.658823 13.5474 7.75066e-05 14.6984 0H16.9328ZM3.59493 26H28.0363L16.9328 3H14.6984L3.59493 26ZM15.8156 19C16.9202 19.0001 17.8156 19.8955 17.8156 21C17.8156 22.1045 16.9202 22.9999 15.8156 23C14.7111 23 13.8156 22.1046 13.8156 21C13.8156 19.8954 14.7111 19 15.8156 19ZM17.3156 16.5H14.3156V8.5H17.3156V16.5Z",fill:"var(--next-error-title)"})})}("function"==typeof t.default||"object"==typeof t.default&&null!==t.default)&&void 0===t.default.__esModule&&(Object.defineProperty(t.default,"__esModule",{value:!0}),Object.assign(t.default,t),r.exports=t.default)},68027,(e,r,t)=>{"use strict";Object.defineProperty(t,"__esModule",{value:!0}),Object.defineProperty(t,"default",{enumerable:!0,get:function(){return l}}),e.r(55682);let n=e.r(43476);e.r(71645);let o=e.r(12354),i=e.r(18576),l=function({error:e}){let r=e?.digest,t=!!r;return(0,o.handleISRError)({error:e}),(0,n.jsxs)("html",{id:"__next_error__",children:[(0,n.jsx)("head",{children:(0,n.jsx)("style",{dangerouslySetInnerHTML:{__html:i.errorThemeCss}})}),(0,n.jsxs)("body",{children:[(0,n.jsx)("div",{style:i.errorStyles.container,children:(0,n.jsxs)("div",{style:i.errorStyles.card,children:[(0,n.jsx)(i.WarningIcon,{}),(0,n.jsx)("h1",{style:i.errorStyles.title,children:"This page couldn’t load"}),(0,n.jsx)("p",{style:i.errorStyles.message,children:t?"A server error occurred. Reload to try again.":"Reload to try again, or go back."}),(0,n.jsxs)("div",{style:i.errorStyles.buttonGroup,children:[(0,n.jsx)("form",{style:i.errorStyles.form,children:(0,n.jsx)("button",{type:"submit",style:i.errorStyles.button,children:"Reload"})}),!t&&(0,n.jsx)("button",{type:"button",style:i.errorStyles.buttonSecondary,onClick:()=>{window.history.length>1?window.history.back():window.location.href="/"},children:"Back"})]})]})}),r&&(0,n.jsxs)("p",{style:i.errorStyles.digestFooter,children:["ERROR ",r]})]})]})};("function"==typeof t.default||"object"==typeof t.default&&null!==t.default)&&void 0===t.default.__esModule&&(Object.defineProperty(t.default,"__esModule",{value:!0}),Object.assign(t.default,t),r.exports=t.default)},42732,(e,r,t)=>{"use strict";e.i(47167),Object.defineProperty(t,"__esModule",{value:!0}),Object.defineProperty(t,"HeadManagerContext",{enumerable:!0,get:function(){return n}});let n=e.r(55682)._(e.r(71645)).default.createContext({})}]);
+;/* Static-export enhancement. Reapply after exporting the original Next.js project. */
+(() => {
+  if (window.fumeOwnerFooterInstalled) return;
+  window.fumeOwnerFooterInstalled = true;
+  function addOwnerLink() {
+    document.querySelectorAll('footer').forEach(footer => {
+      if (footer.querySelector('[data-owner-dashboard]')) return;
+      const arabic = location.pathname.startsWith('/ar/');
+      const row = document.createElement('div');
+      row.dataset.ownerDashboard = 'true';
+      row.style.cssText = 'max-width:1280px;margin:auto;padding:20px 32px;border-top:1px solid #ffffff26;font-size:14px';
+      const link = document.createElement('a');
+      // Use a full document navigation: the old RSC export contains a placeholder dashboard.
+      link.href = arabic ? '/ar/dashboard/' : '/dashboard/';
+      link.textContent = arabic ? 'لوحة المالك ↗' : 'Owner dashboard ↗';
+      link.style.cssText = 'color:inherit;text-decoration:underline;text-underline-offset:4px';
+      row.append(link);
+      footer.append(row);
+    });
+  }
+  new MutationObserver(addOwnerLink).observe(document.documentElement, {childList:true, subtree:true});
+  addOwnerLink();
+})();
