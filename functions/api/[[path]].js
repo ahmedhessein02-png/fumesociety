@@ -1,3 +1,4 @@
+import {allowedStoreRequest} from '../../server/public-api.mjs';
 import {setup,catalog,publicProduct,validateProduct,quote} from '../../server/catalog.mjs';
 import {digest, token, passwordHash, equal} from '../../server/crypto.mjs';
 const cookieName='__Host-fume_admin';
@@ -16,7 +17,7 @@ export async function onRequest({request:req,env}) {
  if(path.startsWith('/api/images/')&&method==='GET'){const row=await env.DB.prepare('SELECT mime,data FROM product_images WHERE id=?').bind(path.split('/').pop()).first();return row?new Response(row.data,{headers:{'Content-Type':row.mime,'Cache-Control':'public,max-age=31536000,immutable','X-Content-Type-Options':'nosniff'}}):reply({error:'Not found.'},404)}
  if(path==='/api/catalog'&&method==='GET'){const {overrides}=await catalog(env.DB);return reply({products:overrides.map(publicProduct)})}
  if(path==='/api/shop'&&method==='GET'){const {all}=await catalog(env.DB);return reply({products:all.filter(p=>p.published).map(publicProduct)})}
- if(method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)return reply({error:'Invalid origin.'},403);
+ if(method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin&&!allowedStoreRequest(req))return reply({error:'Invalid origin.'},403);
  if(path==='/api/orders'&&method==='POST'){
   if(!await limit(env.DB,req,'order',30))return reply({error:'Too many requests.'},429);
   let o;try{o=await body(req)}catch{return reply({error:'Invalid order.'},400)}

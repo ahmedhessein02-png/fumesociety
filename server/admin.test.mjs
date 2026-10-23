@@ -60,3 +60,15 @@ test('catalog edits, authoritative discounts, orders, status and image protectio
  const uploaded=await upload('image/jpeg',[255,216,255]);assert.equal(uploaded.status,201);const {image}=await uploaded.json();const photo=await onRequest({env,request:new Request('https://shop.test'+image)});assert.equal(photo.headers.get('content-type'),'image/jpeg');assert.deepEqual([...new Uint8Array(await photo.arrayBuffer())],[255,216,255]);
  const stats=await (await request('admin/stats','GET',null,true)).json();assert.equal(stats.total,2);assert.ok(stats.value>=160);
 });
+test('storefront cross-origin checkout saves orders and keeps admin routes private',async()=>{
+ const {default:worker}=await import('./worker.mjs');
+ const send=(path,method,data,origin='https://fumesociety.com')=>worker.fetch(new Request('https://fumesociety.ahmedhessein02.workers.dev/api/'+path,{method,headers:{origin,'Content-Type':'application/json','CF-Connecting-IP':'checkout-cors-test'},...(data?{body:JSON.stringify(data)}:{})}),env);
+ const preflight=await send('orders','OPTIONS');assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),'https://fumesociety.com');assert.equal(preflight.headers.get('access-control-allow-credentials'),null);
+ assert.equal((await send('orders','OPTIONS',null,'https://evil.test')).status,403);
+ assert.equal((await send('admin/login','OPTIONS')).status,403);
+ const denied=await send('admin/login','POST',{username:'owner',password});assert.equal(denied.status,403);assert.equal(denied.headers.get('access-control-allow-origin'),null);
+ const order={ref:'FS-CORS-CHECKOUT-123',name:'Local test',phone:'000000000',city:'Test',address:'Test',payment:'cod',lines:[{id:base[0].id,size:base[0].variants[0].size,qty:1}]};
+ const accepted=await send('orders','POST',order);assert.equal(accepted.status,201);assert.equal(accepted.headers.get('access-control-allow-origin'),'https://fumesociety.com');assert.equal((await accepted.json()).saved,true);assert.ok(sql.prepare('SELECT ref FROM orders WHERE ref=?').get(order.ref));
+ const retry=await send('orders','POST',order);assert.equal(retry.status,201);assert.equal(sql.prepare('SELECT count(*) AS n FROM orders WHERE ref=?').get(order.ref).n,1);
+ const invalid=await send('orders','POST',{});assert.equal(invalid.status,400);assert.equal(invalid.headers.get('access-control-allow-origin'),'https://fumesociety.com');
+});
