@@ -59,6 +59,14 @@ test('catalog edits, authoritative discounts, orders, status and image protectio
  assert.equal((await upload('image/jpeg',[255,216,255],false)).status,401);
  const uploaded=await upload('image/jpeg',[255,216,255]);assert.equal(uploaded.status,201);const {image}=await uploaded.json();const photo=await onRequest({env,request:new Request('https://shop.test'+image)});assert.equal(photo.headers.get('content-type'),'image/jpeg');assert.deepEqual([...new Uint8Array(await photo.arrayBuffer())],[255,216,255]);
  const stats=await (await request('admin/stats','GET',null,true)).json();assert.equal(stats.total,2);assert.ok(stats.value>=160);
+ assert.equal((await request('admin/orders','PATCH',{ref:order.ref,removed:true})).status,401);
+ assert.equal((await request('admin/orders','PATCH',{ref:order.ref,removed:true},true)).status,200);
+ assert.equal((await (await request('admin/stats','GET',null,true)).json()).total,1);
+ assert.equal((await (await request('admin/orders','GET',null,true)).json()).orders.some(o=>o.ref===order.ref),false);
+ assert.equal((await (await request('admin/orders?removed=1','GET',null,true)).json()).orders.some(o=>o.ref===order.ref),true);
+ assert.equal((await request('admin/orders','PATCH',{ref:order.ref,removed:false},true)).status,200);
+ assert.equal((await (await request('admin/stats','GET',null,true)).json()).total,2);
+
 });
 test('storefront cross-origin checkout saves orders and keeps admin routes private',async()=>{
  const {default:worker}=await import('./worker.mjs');

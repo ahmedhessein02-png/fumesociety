@@ -69,17 +69,21 @@ export async function onRequest({request:req,env}) {
  }
  if(path==='/api/admin/orders'&&method==='PATCH'){
   let input;try{input=await body(req)}catch{return reply({error:'Invalid request.'},400)}
+  if(typeof input.removed==='boolean'&&typeof input.ref==='string'){
+   const result=await env.DB.prepare("UPDATE orders SET payload=json_set(payload,'$.removed',?) WHERE ref=?").bind(input.removed?1:0,input.ref).run();
+   if((result.meta?.changes??result.changes)===0)return reply({error:'Order not found.'},404);return reply({saved:true});
+  }
   if(!['new','confirmed','completed','cancelled'].includes(input.status)||typeof input.ref!=='string')return reply({error:'Invalid status.'},400);
   const result=await env.DB.prepare("UPDATE orders SET payload=json_set(payload,'$.status',?) WHERE ref=?").bind(input.status,input.ref).run();if((result.meta?.changes??result.changes)===0)return reply({error:'Order not found.'},404);return reply({saved:true});
  }
  if(path==='/api/admin/stats'&&method==='GET'){
-  const row=await env.DB.prepare("SELECT COUNT(*) AS total,SUM(CASE WHEN COALESCE(json_extract(payload,'$.status'),'new')='new' THEN 1 ELSE 0 END) AS newOrders,SUM(CASE WHEN COALESCE(json_extract(payload,'$.status'),'new')!='cancelled' THEN COALESCE(json_extract(payload,'$.subtotal'),0) ELSE 0 END) AS value FROM orders").bind().first();return reply(row);
+  const row=await env.DB.prepare("SELECT COUNT(*) AS total,SUM(CASE WHEN COALESCE(json_extract(payload,'$.status'),'new')='new' THEN 1 ELSE 0 END) AS newOrders,SUM(CASE WHEN COALESCE(json_extract(payload,'$.status'),'new')!='cancelled' THEN COALESCE(json_extract(payload,'$.subtotal'),0) ELSE 0 END) AS value FROM orders WHERE COALESCE(json_extract(payload,'$.removed'),0)=0").bind().first();return reply(row);
  }
  if(path==='/api/admin/session'&&method==='GET')return reply({authenticated:true});
  if(path==='/api/admin/orders'&&method==='GET'){
   const raw=Number(new URL(req.url).searchParams.get('before')||Number.MAX_SAFE_INTEGER);const before=Number.isSafeInteger(raw)&&raw>0?raw:Number.MAX_SAFE_INTEGER;
   // Cursor uses monotonically increasing rowid, so equal timestamps cannot omit orders.
-  const rows=await env.DB.prepare('SELECT rowid AS cursor,ref,created_at,payload FROM orders WHERE rowid<? ORDER BY rowid DESC LIMIT 101').bind(before).all();
+  const rows=await env.DB.prepare("SELECT rowid AS cursor,ref,created_at,payload FROM orders WHERE rowid<? AND COALESCE(json_extract(payload,'$.removed'),0)=? ORDER BY rowid DESC LIMIT 101").bind(before,new URL(req.url).searchParams.get('removed')==='1'?1:0).all();
   return reply({orders:rows.results.slice(0,100).map(o=>({ref:o.ref,created_at:o.created_at,...JSON.parse(o.payload)})),next:rows.results.length>100?rows.results[99].cursor:null});
  }
  return reply({error:'Not found.'},404);
